@@ -5,30 +5,31 @@ namespace App\Controller;
 
 use App\Entity\Argonautes;
 
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormTypeInterface;
 
 use Symfony\Component\Routing\Annotation\Route;
 
 
-/**
- * @method createQueryBuilder()
- */
+
 class DefaultController extends AbstractController
 {
 
     /**
      * Page d'Accueil
-     * @Route("/home", name="default_home", methods={"GET|POST"})
+     * @Route("/", name="default_home", methods={"GET|POST"})
      * @param Request $request
      *
      * @return Response
      */
-    public function home(Request $request, $list2) 
+    public function home(Request $request)
     {
 
         # Ajout d'un nouveau argonaute
@@ -40,6 +41,9 @@ class DefaultController extends AbstractController
                 'label' => false,
 
                 
+            ])
+            ->add('id',IntegerType::class, [
+                'label' => false,
             ])
 
             # Bouton Valider
@@ -73,26 +77,24 @@ class DefaultController extends AbstractController
             
             ->getRepository(Argonautes::class)
             
-            ->findBy(array(),  null, 25, null);
+            ->recherche('id');
+
+        $list2 = $this->getDoctrine()
+
+            ->getRepository(Argonautes::class)
+
+            ->recherche2('id');
+
+        $list3 = $this->getDoctrine()
+
+            ->getRepository(Argonautes::class)
+
+            ->recherche3('id');
 
 
 
-        $qb = $this->createQueryBuilder($list2);
-
-        $em = $qb->getEntityManager();
-
-// example4: retrieve the DQL string of what was defined in QueryBuilder
-        $dql = $qb->getDql();
-
-// example5: retrieve the associated Query object with the processed DQL
-        $q = $qb->getQuery();
 
 
-
-    $qb->select('nom')
-    ->from('argonautes')
-    ->where('id')
-    ->Between(1, 2);
 
 
 
@@ -103,7 +105,9 @@ class DefaultController extends AbstractController
         return $this->render("default/home.html.twig", [
             'form' => $form->createView(),
             'list' => $list,
-            'list2' => $list2
+            'list2' => $list2,
+            'list3' => $list3,
+
             
         ]);
     }
